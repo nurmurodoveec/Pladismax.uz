@@ -4,8 +4,8 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 export const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Auth helper functions
-export async function signIn(email, password) {
-    return await supabaseClient.auth.signInWithPassword({ email, password });
+export async function signIn(phone, password) {
+    return await supabaseClient.auth.signInWithPassword({ phone, password });
 }
 
 export async function signOut() {
