@@ -26,20 +26,20 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 async function createTestAccounts() {
   console.log('Creating test accounts...\n');
 
-  const accounts = [
-    {
-      email: 'admin@b2b.local',
-      password: 'admin123456',
-      full_name: 'Администратор',
-      role: 'admin'
-    },
-    {
-      email: 'client@b2b.local',
-      password: 'client123456',
-      full_name: 'Тестовый Клиент',
-      role: 'client'
-    }
-  ];
+const accounts = [
+  {
+    phone: '+998974110180',
+    password: 'Oybekisroilov01',
+    full_name: 'Администратор',
+    role: 'admin'
+  },
+  {
+    phone: '+998972222222',
+    password: 'client123456',
+    full_name: 'Тестовый Клиент',
+    role: 'client'
+  }
+];
 
   for (const account of accounts) {
     try {
@@ -54,22 +54,23 @@ async function createTestAccounts() {
         continue;
       }
 
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: account.email,
-        password: account.password,
-        email_confirm: true
+      const { data: authData, error: authError } =await supabase.auth.admin.createUser({
+  phone: account.phone,
+  password: account.password,
+  phone_confirm: true
+});
       });
 
       if (authError) throw authError;
 
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
-          id: authData.user.id,
-          email: account.email,
-          full_name: account.full_name,
-          role: account.role
-        });
+      .insert({
+  id: authData.user.id,
+  phone: account.phone,
+  full_name: account.full_name,
+  role: account.role
+});
 
       if (profileError) throw profileError;
 
