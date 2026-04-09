@@ -121,14 +121,15 @@ export function renderLoginPage(onSuccess) {
             return;
         }
 
-        const email = phoneRaw + '@b2b.local';
+        const phone = '+998' + phoneRaw;
+
 
         errorMessage.innerHTML = '';
         loginBtn.disabled = true;
         loginBtn.textContent = 'Вход...';
 
         try {
-            const { data, error } = await signIn(email, password);
+           const { data, error } = await signIn(phone, password);
 
             if (error) {
                 throw error;
