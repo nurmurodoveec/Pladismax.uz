@@ -19,76 +19,74 @@ if (!supabaseUrl || !supabaseServiceKey) {
 const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
-    persistSession: false
-  }
+    persistSession: false,
+  },
 });
 
 async function createTestAccounts() {
   console.log('Creating test accounts...\n');
 
-const accounts = [
-  {
-    phone: '+998974110180',
-    password: 'Oybekisroilov01',
-    full_name: 'Администратор',
-    role: 'admin'
-  },
-  {
-    phone: '+998972222222',
-    password: 'client123456',
-    full_name: 'Тестовый Клиент',
-    role: 'client'
-  }
-];
+  const accounts = [
+    {
+      phone: '+998974110180',
+      password: 'Oybekisroilov01',
+      full_name: 'Администратор',
+      role: 'admin',
+    },
+    {
+      phone: '+998972222222',
+      password: 'client123456',
+      full_name: 'Тестовый Клиент',
+      role: 'client',
+    },
+  ];
 
   for (const account of accounts) {
     try {
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: existingError } = await supabase
         .from('profiles')
-        .select('email')
-        .eq('email', account.email)
+        .select('phone')
+        .eq('phone', account.phone)
         .maybeSingle();
 
+      if (existingError) throw existingError;
+
       if (existingProfile) {
-        console.log(`✓ Account ${account.email} already exists`);
+        console.log(`✓ Account ${account.phone} already exists`);
         continue;
       }
 
-      const { data: authData, error: authError } =await supabase.auth.admin.createUser({
-  phone: account.phone,
-  password: account.password,
-  phone_confirm: true
-});
-      });
+      const { data: authData, error: authError } =
+        await supabase.auth.admin.createUser({
+          phone: account.phone,
+          password: account.password,
+          phone_confirm: true,
+        });
 
       if (authError) throw authError;
 
       const { error: profileError } = await supabase
         .from('profiles')
-      .insert({
-  id: authData.user.id,
-  phone: account.phone,
-  full_name: account.full_name,
-  role: account.role
-});
+        .insert({
+          id: authData.user.id,
+          phone: account.phone,
+          full_name: account.full_name,
+          role: account.role,
+        });
 
       if (profileError) throw profileError;
 
-      console.log(`✓ Created ${account.role} account: ${account.email}`);
+      console.log(`✓ Created ${account.role} account: ${account.phone}`);
       console.log(`  Password: ${account.password}`);
     } catch (error) {
-      console.error(`✗ Error creating account ${account.email}:`, error.message);
+      console.error(`✗ Error creating account ${account.phone}:`, error.message);
     }
   }
 
   console.log('\n=== Test Accounts ===');
-  console.log('\nAdmin Account:');
-  console.log('  Email: admin@b2b.local');
-  console.log('  Password: admin123456');
-  console.log('\nClient Account:');
-  console.log('  Email: client@b2b.local');
-  console.log('  Password: client123456');
-  console.log('\n=====================\n');
+  console.log('Admin:  +998974110180 / Oybekisroilov01');
+  console.log('Client: +998972222222 / client123456');
+  console.log('=====================\n');
 }
 
 createTestAccounts();
